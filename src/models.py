@@ -25,8 +25,8 @@ class User(db.Model):
             "name": self.name,
             "last_name": self.last_name,
             "email": self.email,
-            "favorite_planet": self.favorite_planet,
-            "favorite_character": self.favorite_character,
+            # "favorite_planet": self.favorite_planet,
+            # "favorite_character": self.favorite_character,
 
             # do not serialize the password, its a security breach
         }
@@ -42,6 +42,9 @@ class Character(db.Model):
     weight: Mapped[str] = mapped_column(Integer,nullable=True)
 
     favorite_character = relationship("FavoriteCharacter", back_populates="character")
+
+    def __str__(self): 
+        return self.name
     
     def serialize(self):
         return {
@@ -64,6 +67,10 @@ class FavoriteCharacter(db.Model):
 
     character_id = mapped_column(ForeignKey("character.id"))
     character = relationship("Character", back_populates="favorite_character")
+
+    
+    def __str__(self): 
+        return self.id
 
     def serialize(self):
         return {
@@ -98,7 +105,6 @@ class Planet(db.Model):
     
 class FavoritePlanet(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    # name: Mapped[str] = mapped_column(String(120), nullable=True)
 
     user_id = mapped_column(ForeignKey("user.id"))
     user = relationship("User", back_populates="favorite_planet")
@@ -106,10 +112,10 @@ class FavoritePlanet(db.Model):
     planet_id = mapped_column(ForeignKey("planet.id"))
     planet = relationship("Planet", back_populates="favorite_planet")
 
-#     # empresa_id = mapped_column(ForeignKey("empresa.id"))
-#     # empresa = relationship("Empresa", back_populates="favorite_planet")
+
     
-    
+    def __str__(self): 
+        return self.id
 
     def serialize(self):
         return {
@@ -119,44 +125,6 @@ class FavoritePlanet(db.Model):
         
         }
     
-# class Empresa(db.Model):
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
-#     ciudad: Mapped[str] = mapped_column(nullable=False)
-#     slogan: Mapped[str] = mapped_column(nullable=False)
-
-#     videojuego = relationship("Videojuego", back_populates="empresa")
-#     favorite_planet = relationship("FavoritePlanet", back_populates="empresa")
-
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "nombre": self.nombre,
-#             "ciudad": self.ciudad,
-#             "slogan": self.s
-#         }
-    
-#     def __str__(self): 
-#         return self.nombre 
-
-
-# class Videojuego(db.Model):
-#     id: Mapped[int] = mapped_column(primary_key=True)
-#     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
-#     genero: Mapped[str] = mapped_column(nullable=False)
-#     year: Mapped[int] = mapped_column(nullable=False)
-
-#     empresa_id = mapped_column(ForeignKey("empresa.id"))
-#     empresa = relationship("Empresa", back_populates="videojuego")
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "nombre": self.nombre,
-#             "genero": self.genero
-#             # do not serialize the password, its a security breach
-#         }
 
  
     

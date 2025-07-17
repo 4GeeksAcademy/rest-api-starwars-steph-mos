@@ -1,12 +1,19 @@
 import os
 from flask_admin import Admin
-from models import db, User, Character, Planet, FavoritePlanet
+from models import db, User, Character, Planet, FavoritePlanet, FavoriteCharacter
 from flask_admin.contrib.sqla import ModelView
 
 class FavoritePlanetAdmin(ModelView):
     column_auto_selected_related = True
     column_list = ['id','user_id','user','planet_id','planet']
 
+class FavoriteCharacterAdmin(ModelView):
+    column_auto_selected_related = True
+    column_list = ['id','user_id','user','character_id','character']
+
+class UserModelView(ModelView):
+    column_auto_selected_related = True
+    column_list = ['id','name','last_name','email','password', 'is_active', 'favorite_planet', 'favorite_character' ]
 
 
 def setup_admin(app):
@@ -20,6 +27,7 @@ def setup_admin(app):
     admin.add_view(ModelView(Character, db.session))
     admin.add_view(ModelView(Planet, db.session))
     admin.add_view(FavoritePlanetAdmin(FavoritePlanet, db.session))
+    admin.add_view(FavoriteCharacterAdmin(FavoriteCharacter, db.session))
 
 
 

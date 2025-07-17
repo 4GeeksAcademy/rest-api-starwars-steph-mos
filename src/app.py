@@ -8,7 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Character, Planet
+from models import db, User, Character, Planet, FavoritePlanet
+from sqlalchemy import select
 #from models import Person
 
 app = Flask(__name__)
@@ -36,37 +37,28 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+
 @app.route('/user', methods=['GET'])
 def get_users():
-    all_users = User.query.all()
-    results = list(map(lambda user: user.serialize(), all_users))
-
-
-    response_body = {
-        "msg": "Hello, here is your users list",
-        "users": results 
-    }
-
-    return jsonify(response_body), 200
+    users = db.session.execute(select(User)).scalars().all()
+    results = list(map(lambda user: user.serialize(), users))
+   
+    return jsonify(results), 200
 
 
 
 @app.route('/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    print(user_id)
-    all_user = User.query.all()
-    results = list(map(lambda user: user.serialize(), all_user))
-
+    user = db.session.get(User, user_id)
 
     response_body = {
-        "msg": "Hello, here is your users list",
-        "user_id": results 
+        "user": user.serialize()
     }
-
+    
     return jsonify(response_body), 200
 
 
-@app.route('/character', methods=['GET'])
+@app.route('/people', methods=['GET'])
 def get_characters():
     all_characters = Character.query.all()
     results = list(map(lambda character: character.serialize(), all_characters))
@@ -79,6 +71,17 @@ def get_characters():
     return jsonify(response_body), 200
 
 
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_character(people_id):
+    character = db.session.get(Character, people_id)
+
+    response_body = {
+        "user": character.serialize()
+    }
+    
+    return jsonify(response_body), 200
+
+
 @app.route('/planet', methods=['GET'])
 def get_planets():
     all_planets = Planet.query.all()
@@ -86,11 +89,38 @@ def get_planets():
 
 
     response_body = {
-        "msg": "Here is your planets list ",
+        "msg": "Here is your planet list ",
         "planet_id": results
     }
 
     return jsonify(response_body), 200
+
+
+@app.route('/planet/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
+    planet = db.session.get(Planet, planet_id)
+
+    response_body = {
+        "user": planet.serialize()
+    }
+    
+    return jsonify(response_body), 200
+
+
+@app.route('/user/favorites', methods=['GET'])
+def get_user_favorites():
+    all_favorites = FavoritePlanet.query.all()
+    results = list(map(lambda planet: planet.serialize(), all_favorites))
+
+
+    response_body = {
+        "msg": "Here is your planet list ",
+        "planet_id": results
+    }
+
+    return jsonify(response_body), 200
+
+
 
 
 
