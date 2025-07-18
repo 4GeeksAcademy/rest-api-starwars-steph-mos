@@ -31,6 +31,23 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
     
+    def serialize_relationships (self):        
+        return {
+            "id": self.id,
+            "name": self.name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "favorite_planet": [planetfav.serialize() for planetfav in self.favorite_planet ],
+            "favorite_character": [characterfav.serialize() for characterfav in self.favorite_character]
+        }
+    
+    def serialize_favorite (self):
+        return {
+            "favorite_planet": [planetfav.serialize() for planetfav in self.favorite_planet ],
+            "favorite_character": [characterfav.serialize() for characterfav in self.favorite_character]
+        }
+
+    
 class Character(db.Model):
     __tablename__='character'
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -75,8 +92,8 @@ class FavoriteCharacter(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "user": self.user,
-            "character": self.character
+            # "user": self.user.serialize(),
+            "character": self.character.serialize()
         }
     
     
@@ -120,10 +137,10 @@ class FavoritePlanet(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "user": self.user,
-            "planet":self.planet
-        
+            # "user": self.user,
+            "planet":self.planet.serialize()
         }
+        
     
 
  

@@ -41,7 +41,7 @@ def sitemap():
 @app.route('/user', methods=['GET'])
 def get_users():
     users = db.session.execute(select(User)).scalars().all()
-    results = list(map(lambda user: user.serialize(), users))
+    results = list(map(lambda user: user.serialize_relationships(), users))
    
     return jsonify(results), 200
 
@@ -107,18 +107,30 @@ def get_planet(planet_id):
     return jsonify(response_body), 200
 
 
-@app.route('/user/favorites', methods=['GET'])
-def get_user_favorites():
-    all_favorites = FavoritePlanet.query.all()
-    results = list(map(lambda planet: planet.serialize(), all_favorites))
+@app.route('/user/favorites/<int:user_id>', methods=['GET'])
+def get_user_favorites(user_id):
+    user = db.session.get(User, user_id)
+
+    
+
+    return {
+        "msg": "Here is your favorites list ",
+        "favorites": user.serialize_favorite()
+    } , 200
 
 
-    response_body = {
-        "msg": "Here is your planet list ",
-        "planet_id": results
-    }
+@app.route('/user/favorites/<int:user_id>', methods=['POST'])
+def add_user_favorites(user_id):
+    user = db.session.get(User, user_id)
 
-    return jsonify(response_body), 200
+    
+
+    return {
+        "msg": "You have add a favorite",
+        "favorites": user.serialize_favorite()
+    } , 200
+
+
 
 
 
