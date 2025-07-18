@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Character, Planet, FavoritePlanet
+from models import db, User, Character, Planet, FavoritePlanet, FavoriteCharacter
 from sqlalchemy import select
 #from models import Person
 
@@ -107,7 +107,7 @@ def get_planet(planet_id):
     return jsonify(response_body), 200
 
 
-@app.route('/user/favorites/<int:user_id>', methods=['GET'])
+@app.route('/user/favorite/<int:user_id>', methods=['GET'])
 def get_user_favorites(user_id):
     user = db.session.get(User, user_id)
 
@@ -119,15 +119,46 @@ def get_user_favorites(user_id):
     } , 200
 
 
-@app.route('/user/favorites/<int:user_id>', methods=['POST'])
-def add_user_favorites(user_id):
-    user = db.session.get(User, user_id)
 
+
+@app.route('/user/favorite', methods=['GET'])
+def get_users_favorites():
+    all_favorite_planets = db.session.execute(select(FavoritePlanet)).scalars().all()
+    all_favorite_characters = db.session.execute(select(FavoriteCharacter)).scalars().all()
     
+    planetsfav = [planet.serialize() for planet in all_favorite_planets]
+    charactersfav = [character.serialize() for character in all_favorite_characters]
 
     return {
-        "msg": "You have add a favorite",
-        "favorites": user.serialize_favorite()
+        "msg": "Here is your favorites list ",
+        "favorite_planets": planetsfav,
+        "favorite_characters": charactersfav,
+    } , 200
+
+
+
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_fav_planet(planet_id):
+    user = db.session.execute(select(User)).scalars().first()
+    planet = db.session.execute(select(Planet).where(Planet.id == planet_id)).scalar_one()
+
+    print(user)
+    print(planet)
+
+    if planet is None:
+        return {
+        "msg": "Something happened, the planet does not exist"
+    } , 401
+    
+    favorite_planet = FavoritePlanet (user_id=user.id, planet_id=planet.id)
+
+    db.session.add(favorite_planet)
+    db.session.commit()
+
+    return {
+        "msg": "You have add a favorite planet"
     } , 200
 
 
