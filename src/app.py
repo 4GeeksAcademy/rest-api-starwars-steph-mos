@@ -41,7 +41,7 @@ def sitemap():
 @app.route('/user', methods=['GET'])
 def get_users():
     users = db.session.execute(select(User)).scalars().all()
-    results = list(map(lambda user: user.serialize_relationships(), users))
+    results = list(map(lambda user: user.serialize(), users))
    
     return jsonify(results), 200
 
