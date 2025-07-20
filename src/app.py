@@ -144,8 +144,6 @@ def add_fav_planet(planet_id):
     user = db.session.execute(select(User)).scalars().first()
     planet = db.session.execute(select(Planet).where(Planet.id == planet_id)).scalar_one()
 
-    print(user)
-    print(planet)
 
     if planet is None:
         return {
@@ -159,6 +157,70 @@ def add_fav_planet(planet_id):
 
     return {
         "msg": "You have add a favorite planet"
+    } , 200
+
+
+
+@app.route('/favorite/people/<int:people_id>', methods=['POST'])
+def add_fav_character(people_id):
+    user = db.session.execute(select(User)).scalars().first()
+    character = db.session.execute(select(Character).where(Character.id == people_id)).scalar_one()
+
+    if character is None:
+        return {
+        "msg": "Something happened, the character does not exist"
+    } , 401
+    
+    favorite_character = FavoriteCharacter (user_id=user.id, character_id=character.id)
+
+    db.session.add(favorite_character)
+    db.session.commit()
+
+    return {
+        "msg": "You have add a favorite character"
+    } , 200
+
+
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def delete_fav_planet(planet_id):
+    
+    favorite_planet = db.session.execute(select(FavoritePlanet).where(FavoritePlanet.id == planet_id)).scalars().first()
+
+    print(favorite_planet)
+
+    if favorite_planet is None:
+        return {
+        "msg": "Something happened, the favorite planet does not exist"
+    } , 401
+    
+
+    db.session.delete(favorite_planet)
+    db.session.commit()
+
+    return {
+        "msg": "You have delete a favorite planet"
+    } , 200
+    
+
+@app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
+def delete_fav_character(people_id):
+    
+    favorite_character = db.session.execute(select(FavoriteCharacter).where(FavoriteCharacter.id == people_id)).scalars().first()
+
+
+    if favorite_character is None:
+        return {
+        "msg": "Something happened, the favorite character does not exist"
+    } , 401
+    
+
+    db.session.delete(favorite_character)
+    db.session.commit()
+
+    return {
+        "msg": "You have delete a favorite character"
     } , 200
 
 

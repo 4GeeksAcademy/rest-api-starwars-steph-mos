@@ -87,12 +87,12 @@ class FavoriteCharacter(db.Model):
 
     
     def __str__(self): 
-        return self.id
+        return str(self.id)
 
     def serialize(self):
         return {
             "id": self.id,
-            # "user": self.user.serialize(),
+            "user": self.user.serialize(),
             "character": self.character.serialize()
         }
     
@@ -132,12 +132,13 @@ class FavoritePlanet(db.Model):
 
     
     def __str__(self): 
-        return self.id
+        return str(self.id)
+    
 
     def serialize(self):
         return {
             "id": self.id,
-            # "user": self.user,
+            "user": self.user,
             "planet":self.planet.serialize()
         }
         
